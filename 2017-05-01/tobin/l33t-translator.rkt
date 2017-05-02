@@ -1,6 +1,8 @@
 #lang racket
 (require Racket-miniKanren/miniKanren/mk)
 
+(module+ test (require rackunit))
+
 (define assocs1
   '((#\a . #\4)
     (#\b . #\6)
@@ -20,15 +22,10 @@
       (=/= a bh)
       (noneo a bt)))))
 
-(define (unify-pairs a b pairs)
-  (match pairs
-    ['() (fresh (x) (=/= x x))]
-    [`((,ap . ,bp) . ,tail)
-     (conde
-      ((== ap a)
-       (== bp b))
-
-      ((unify-pairs a b tail)))]))
+(define (conde* cs)
+  (match cs
+    ['()         (fresh (x) (=/= x x))]
+    [(cons x xs) (conde ((fresh () x)) ((conde* xs)))]))
 
 (define (leeto in out)
   (conde
@@ -39,12 +36,15 @@
       (== `(,ih . ,it) in)
       (== `(,oh . ,ot) out)
       (leeto it ot)
-      (conde
-       ((unify-pairs ih oh assocs1))
-       
-       ((noneo ih (map car assocs1))
-        (noneo oh (map cdr assocs1))
-        (== ih oh)))))))
+      (conde* (cons (fresh ()
+                      (noneo ih (map car assocs1))
+                      (noneo oh (map cdr assocs1))
+                      (== ih oh))
+
+                    (map (λ (pair) (fresh ()
+                                     (== ih (car pair))
+                                     (== oh (cdr pair))))
+                         assocs1)))))))
 
 (define (convert s)
   (let ([input (string->list s)])
@@ -53,3 +53,7 @@
            (conde
             ((leeto q input))
             ((leeto input q)))))))
+
+(module+ test
+  (check-equal? (convert "elite") '("31173"))
+  (check-equal? (convert "31173") '("eiite" "elite" "eilte" "ellte")))
