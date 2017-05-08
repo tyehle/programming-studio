@@ -1,2 +1,7 @@
 *.exe
 *~
+
+.idea/
+*.iml
+
+out/
