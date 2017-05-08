@@ -13,6 +13,9 @@
     (#\s . #\5)
     (#\t . #\7)))
 
+(define assocs2
+  '((#\v . (#\\ #\/))))
+
 (define (noneo a bs)
   (conde
    ((== bs '()))
@@ -24,8 +27,14 @@
 
 (define (conde* cs)
   (match cs
-    ['()         (fresh (x) (=/= x x))]
-    [(cons x xs) (conde ((fresh () x)) ((conde* xs)))]))
+    ['()         (== 1 0)]
+    [(cons x xs) (conde (x) ((conde* xs)))]))
+
+(define (assoco in outs assocs)
+  (conde* (map (λ (pair) (fresh ()
+                           (== in (car pair))
+                           (== outs (cdr pair))))
+               assocs)))
 
 (define (leeto in out)
   (conde
@@ -35,16 +44,15 @@
    ((fresh (ih it oh ot)
       (== `(,ih . ,it) in)
       (== `(,oh . ,ot) out)
-      (leeto it ot)
-      (conde* (cons (fresh ()
-                      (noneo ih (map car assocs1))
-                      (noneo oh (map cdr assocs1))
-                      (== ih oh))
+      (conde
+       ((noneo ih (map car assocs1))
+        (noneo ih (map car assocs2))
+        (noneo oh (map cdr assocs1))
+        (noneo oh (map cadr assocs2))
+        (== ih oh))
 
-                    (map (λ (pair) (fresh ()
-                                     (== ih (car pair))
-                                     (== oh (cdr pair))))
-                         assocs1)))))))
+       ((assoco ih oh assocs1)))
+      (leeto it ot)))))
 
 (define (convert s)
   (let ([input (string->list s)])
