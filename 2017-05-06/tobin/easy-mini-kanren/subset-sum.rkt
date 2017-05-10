@@ -20,6 +20,12 @@
          ((== matched #t) (== out #t))
          ((== matched #f) (subsumo xs out)))))))))
 
+(module+ test
+  (check-equal? (run* (q) (subsumo `((#t . 5) (#f . 1) (#f . 7) ,q) #t))
+                '((#f . 5) (#t . 1) (#t . 7) (#f . 0) (#t . 0)))
+  (check-equal? (run* (q) (subsumo `(,q) #f))
+                '(((_.0 . _.1) (=/= ((_.1 . 0)))))))
+
 (define (is-zero n)
   (fresh (neg num)
     (== (cons neg num) n)
@@ -64,6 +70,7 @@
   (check-equal? (subsum '(-5 -3 -1 2 4 6)) #f)
   (check-equal? (subsum '()) #f)
   (check-equal? (subsum '(-1 1)) #t)
+  (check-equal? (subsum '(1 1)) #f)
   (check-equal? (subsum '(0)) #t)
   (check-equal? (subsum '(-97364 -71561 -69336 19675 71561 97863)) #t)
   (check-equal? (subsum '(-53974 -39140 -36561 -23935 -15680 0)) #t))
