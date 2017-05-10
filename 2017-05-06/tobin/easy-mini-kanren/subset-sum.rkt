@@ -10,10 +10,25 @@
    
    ((fresh (x xs matched)
       (== nums (cons x xs))
-      (check-rest x xs matched)
       (conde
-       ((== matched #t) (== out #t))
-       ((== matched #f) (subsumo xs out)))))))
+       ((is-zero x)
+        (== out #t))
+
+       ((not-zero x)
+        (check-rest x xs matched)
+        (conde
+         ((== matched #t) (== out #t))
+         ((== matched #f) (subsumo xs out)))))))))
+
+(define (is-zero n)
+  (fresh (neg num)
+    (== (cons neg num) n)
+    (== num 0)))
+
+(define (not-zero n)
+  (fresh (neg num)
+    (== (cons neg num) n)
+    (=/= num 0)))
 
 (define (check-rest n rest matched)
   (conde
