@@ -1,6 +1,10 @@
 module Main where
 
-import Lib
+import Rotations
 
 main :: IO ()
-main = someFunc
+main = do
+  inputWords <- lines <$> getContents
+  mapM_ (putStrLn . format . rotateWord) inputWords
+  where
+    format (n, word) = show n ++ " " ++ word
