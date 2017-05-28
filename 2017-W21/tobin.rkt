@@ -30,8 +30,8 @@
     (cons discount tickets)))
 
 (define (bridge-deal tickets)
-  (let* ([n        (count (curry eq? "BC"))]
-         [discount (if (> count 4) (* -20 n) 0)])
+  (let* ([n        (count (curry eq? "BC") tickets)]
+         [discount (if (> n 4) (* -20 n) 0)])
     (cons discount tickets)))
 
 (define deals
