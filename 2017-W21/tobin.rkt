@@ -16,26 +16,37 @@
   (check-equal? (price "BC") 110)
   (check-equal? (price "SK") 30))
 
+;; Define the deals
+
 (define (opera-deal tickets)
-  (list tickets))
+  (let* ([n        (count (curry eq? "OH") tickets)]
+         [discount (* -1 (price "OH") (quotient n 3))])
+    (cons discount tickets)))
 
 (define (tower-deal tickets)
-  (list tickets))
+  (let* ([towers   (count (curry eq? "SK") tickets)]
+         [operas   (count (curry eq? "OH") tickets)]
+         [discount (* -1 (price "SK") (if (> towers operas) operas towers))])
+    (cons discount tickets)))
 
 (define (bridge-deal tickets)
-  (list tickets))
+  (let* ([n        (count (curry eq? "BC"))]
+         [discount (if (> count 4) (* -20 n) 0)])
+    (cons discount tickets)))
 
-(define (flat-map fn xs)
-  (apply append (map fn xs)))
+(define deals
+  (list opera-deal
+        tower-deal
+        bridge-deal))
+
+;; Process a list of tickets
+
+(define (total-price tickets)
+  (apply + (map price (foldl (λ (deal tiks) (deal tiks))
+                             tickets
+                             deals))))
 
 (module+ test
-  (check-equal? (flat-map (λ (n) (make-list n n)) '(1 2 3)) '(1 2 2 3 3 3)))
-
-(define (min-price tickets)
-  (let* ([all-possible (flat-map opera-deal
-                                 (flat-map tower-deal
-                                           (flat-map bridge-deal
-                                                     (list tickets))))]
-         [all-prices (map (λ (ts) (apply + (map price ts)))
-                          all-possible)])
-    (apply min all-prices)))
+  (check-equal? (total-price '("OH" "OH" "OH" "BC")) 710)
+  (check-equal? (total-price '("OH" "SK")) 300)
+  (check-equal? (total-price '("BC" "BC" "BC" "BC" "BC" "OH")) 750))
