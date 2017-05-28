@@ -3,6 +3,10 @@
 (module+ test
   (require rackunit))
 
+(define (debug x)
+  (println x)
+  x)
+
 (define (price item)
   (match item
     [(? number?) item]
@@ -19,18 +23,18 @@
 ;; Define the deals
 
 (define (opera-deal tickets)
-  (let* ([n        (count (curry eq? "OH") tickets)]
+  (let* ([n        (count (curry equal? "OH") tickets)]
          [discount (* -1 (price "OH") (quotient n 3))])
     (cons discount tickets)))
 
 (define (tower-deal tickets)
-  (let* ([towers   (count (curry eq? "SK") tickets)]
-         [operas   (count (curry eq? "OH") tickets)]
+  (let* ([towers   (count (curry equal? "SK") tickets)]
+         [operas   (count (curry equal? "OH") tickets)]
          [discount (* -1 (price "SK") (if (> towers operas) operas towers))])
     (cons discount tickets)))
 
 (define (bridge-deal tickets)
-  (let* ([n        (count (curry eq? "BC") tickets)]
+  (let* ([n        (count (curry equal? "BC") tickets)]
          [discount (if (> n 4) (* -20 n) 0)])
     (cons discount tickets)))
 
@@ -50,3 +54,17 @@
   (check-equal? (total-price '("OH" "OH" "OH" "BC")) 710)
   (check-equal? (total-price '("OH" "SK")) 300)
   (check-equal? (total-price '("BC" "BC" "BC" "BC" "BC" "OH")) 750))
+
+;; Deal with input from stdin
+
+(define orders
+  (letrec ([all-lines (λ (lines)
+                        (let ([line (read-line)])
+                          (if (eq? line eof)
+                              lines
+                              (all-lines (cons line lines)))))])
+    (reverse (all-lines null))))
+
+(for ([line orders])
+  (let ([tickets (string-split line)])
+    (printf "~a = ~a~n" tickets (total-price tickets))))
