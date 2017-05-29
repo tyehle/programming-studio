@@ -3,7 +3,7 @@
 import UIKit
 
 var totalCost = 0
-let testString = "BC BC BC BC BC OH"
+let testString = "OH OH OH BC"
 var str: NSString?
 var key: String
 
@@ -16,7 +16,7 @@ var scanner = Scanner(string: testString)
 scanner.charactersToBeSkipped = space
 while scanner.scanUpToCharacters(from: space, into: &str) {
     key = str! as String
-    print(key, terminator: " ")
+    //print(key, terminator: " ")
     switch key {
     case "OH":
         ohCount += 1
@@ -32,23 +32,22 @@ while scanner.scanUpToCharacters(from: space, into: &str) {
     default:
         break
     }
-    print("t \(totalCost)")
+    //print("t \(totalCost)")
 }
 
-var test: Bool = (skCount != 0) && (ohCount != 0)
-while test {
+
+while (skCount != 0) && (ohCount != 0) {
     totalCost -= 30
     skCount -= 1
     ohCount -= 1
-    test = (skCount != 0) && (ohCount != 0)
 }
-print(totalCost)
+//print(totalCost)
 
 
 if bcCount > 4 {
     totalCost -= 20*bcCount
 }
-print(totalCost)
+//print(totalCost)
 
-
-
+print("Items              Total")
+print("\(testString) = \(totalCost)")
