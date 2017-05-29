@@ -31,10 +31,15 @@
     (append (get-not b input-list) discounted-Bs))) ; add on the new b's list onto our (inputlist - b's)
 
 
-(define (apply-bulk-discount input-list)
-  (if (> (length (get 'BC input-list)) 4)
-      (build-list (length input-list) (λ (x) 'BC-disc))
-      input-list))
+; (apply-bulk-discount 'BC 4 (list 'BC 'BC 'BC))           --> '(BC BC BC)
+; (apply-bulk-discount 'BC 4 (list 'BC 'BC 'BC 'BC 'BC))   --> '(BC-disc BC-disc BC-disc BC-disc BC-disc)
+(define (apply-bulk-discount activity truckloads-for-bulk input-list)
+  (let ([discounted (match activity
+                      ['BC 'BC-disc] ; get the right discount symbol for what we want to discount- 
+                      [_ "this puzzle sucks and there are no other discounts"])])  ;     because this puzzle is stupid our only option is 'BC
+    (if (> (length (get activity input-list)) truckloads-for-bulk) ; do we qualify?
+        (build-list (length input-list) (λ (x) discounted)) ; if yes, then discount all of them
+        input-list)))                                       ; if no, the carry on about your day
 
 
 
