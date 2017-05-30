@@ -41,8 +41,8 @@
 
 
 
-(define (a-for-b-discount a b activity input-list)
-  (drop-activity input-list activity (quotient (length (get activity input-list)) b)))
+(define (a-for-the-price-of-b-discount a b activity input-list)
+  (drop-activity input-list activity (* (- a b) (quotient (length (get activity input-list)) a))))
   ;  (append
   ;   (get-not activity input-list)
   ;   (safe-drop (quotient (length (get activity input-list)) b) (get activity input-list))))
@@ -50,20 +50,19 @@
 ;-------
 (define (buy-a-get-b-free a b input-list)
   (let* ([As (get a input-list)]
-           [Bs (get b input-list)] ;)
-    ;(drop-activity input-list activity (length As)))) <-- for some reason this doesn't work
-           [discounted-Bs (drop Bs (min (length Bs) (length As)))]) ; drop as many "b"s as we can- so either the number of a's or all of them! 
-    (append (get-not b input-list) discounted-Bs))) ; add on the new b's list onto our (inputlist - b's)
+         [Bs (get b input-list)])
+    (drop-activity input-list b (length As)))) ; get rid of as many b's as there are a's 
 
 ;-------
 (define (apply-bulk-discount activity truckloads-for-bulk input-list)
-  (let ([discounted (match activity
+  (let* ([discounted (match activity
                       ['BC 'BC-disc] ; get the right discount symbol for what we want to discount- 
                       [_ "this puzzle sucks and there are no other discounts"])]
         [number-discounted (length (get activity input-list))])  ;     because this puzzle is stupid our only option is 'BC
+    
     (if (> number-discounted truckloads-for-bulk) ; do we qualify?
-        (append (drop-activity input-list activity number-discounted)
-                (build-list (length (get activity input-list)) (λ (x) discounted))) ; if yes, then discount all of them  TODO THIS IS WRONG
+        (append (drop-activity input-list activity number-discounted) ; if yes, get rid of all the old un-discounted ones 
+                (build-list (length (get activity input-list)) (λ (x) discounted))) ; and add that many discounted ones 
         input-list)))                                       ; if no, the carry on about your day
 
 
@@ -73,8 +72,11 @@
 (check-equal? (buy-a-get-b-free 'OH 'SK (list 'OH 'OH)) '(OH OH))
 (check-equal? (buy-a-get-b-free 'OH 'SK (list 'SK 'SK)) '(SK SK))
 ;
-(check-equal? (a-for-b-discount 2 3 'OH (list 'OH 'OH 'OH)) '(OH OH))
-(check-equal? (a-for-b-discount 1 3 'OH (list 'OH 'OH 'OH)) '(OH))
+(check-equal? (a-for-the-price-of-b-discount 3 2 'OH (list 'OH 'OH 'OH)) '(OH OH))
+(check-equal? (a-for-the-price-of-b-discount 3 1 'OH (list 'OH 'OH 'OH)) '(OH))
+(check-equal? (a-for-the-price-of-b-discount 3 1 'OH (list 'OH 'OH 'OH 'OH 'OH)) '(OH OH OH))
+(check-equal? (a-for-the-price-of-b-discount 3 1 'OH (list 'OH 'OH 'OH 'OH)) '(OH OH))
+(check-equal? (a-for-the-price-of-b-discount 5 3 'OH (list 'OH 'OH 'OH 'OH 'OH)) '(OH OH OH))
 ;
 (check-equal? (apply-bulk-discount 'BC 4 (list 'BC 'BC 'BC)) '(BC BC BC))
 (check-equal? (apply-bulk-discount 'BC 4 (list 'BC 'BC 'BC 'BC 'BC)) '(BC-disc BC-disc BC-disc BC-disc BC-disc))
