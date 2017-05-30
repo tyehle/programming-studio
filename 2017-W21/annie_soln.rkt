@@ -2,6 +2,9 @@
 #lang racket
 (require rackunit)
 
+
+; ~~~~~~~~~vvvv BORING HELPER FUNCTIONS vvvv~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 (define (make-some-money elem) (match elem
               ['OH      300]
               ['BC      110]
@@ -9,6 +12,14 @@
               ['SK      30]
               [_         "the fuck is this?"]))
 ;-------
+(define (total input-list)
+    (sum (map (λ (x) (make-some-money x)) input-list)))
+;-------
+; what is this, 200 BC?
+(define (sum L)
+  (apply + L))
+;-------
+
 ; short hand because oh my god so much list filtering
 (define (get what input-list)
   (filter (λ (x) (equal? x what)) input-list))
@@ -41,12 +52,12 @@
 
 
 
-(define (a-for-the-price-of-b-discount a b activity input-list)
-  (drop-activity input-list activity (* (- a b) (quotient (length (get activity input-list)) a))))
-  ;  (append
-  ;   (get-not activity input-list)
-  ;   (safe-drop (quotient (length (get activity input-list)) b) (get activity input-list))))
 
+; ~~~~~~~~~vvvv THIS IS WHAT WE CAME FOR vvvv~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(define (a-for-the-price-of-b-discount a b activity input-list)
+  (drop-activity input-list activity (* (- a b)  ; this is how much the discount is, ie if it's 7-for-5 then the discount is 2
+                                        (quotient (length (get activity input-list)) a)))) ; how times did we see "activity" a times?
 ;-------
 (define (buy-a-get-b-free a b input-list)
   (let* ([As (get a input-list)]
@@ -88,5 +99,29 @@
 
 ;; #####@@@@****&&&&  ROCK_&_ROLL  &&&&&*****@@@@@#########
 
-(define tests (list (list 'OH 'OH 'OH 'BC) (list 'OH 'SK) (list 'BC 'BC 'BC 'BC 'BC 'OH)))
-(define test (list 'OH 'OH 'OH 'BC))
+; We are going to have a 3 for 2 deal on opera house ticket. For example, if you buy 3 tickets, you will pay the price of 2 only getting another one completely free of charge.
+; We are going to give a free Sky Tower tour for with every Opera House tour sold
+; The Sydney Bridge Climb will have a bulk discount applied, where the price will drop $20, if someone buys more than 4
+(define disc1 (λ (x) (a-for-the-price-of-b-discount 3 2 'OH x)))
+(define disc2 (λ (x) (buy-a-get-b-free 'OH 'SK x)))
+(define disc3 (λ (x) (apply-bulk-discount 'BC 4 x)))
+
+;OH, OH, OH, BC  =  710.00
+;OH, SK  = 300.00
+;BC, BC, BC, BC, BC, OH = 750
+
+; real talk:
+(define tests (list '(OH OH OH BC)
+                    '(OH SK)
+                    '(BC BC BC BC BC OH)))
+(check-equal? (map (λ (x) (total(disc3 (disc2 (disc1 x))))) tests) '(710 300 750))
+
+
+; "challenge input"
+(define challenge-tests (list '(OH OH OH BC SK)
+                              '(OH BC BC SK SK)
+                              '(BC BC BC BC BC BC OH OH)
+                              '(SK SK BC)))
+(map (λ (x) (total (disc3 (disc2 (disc1 x))))) challenge-tests)
+; --> '(710 550 1140 170)
+
