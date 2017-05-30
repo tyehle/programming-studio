@@ -59,9 +59,11 @@
 (define (apply-bulk-discount activity truckloads-for-bulk input-list)
   (let ([discounted (match activity
                       ['BC 'BC-disc] ; get the right discount symbol for what we want to discount- 
-                      [_ "this puzzle sucks and there are no other discounts"])])  ;     because this puzzle is stupid our only option is 'BC
-    (if (> (length (get activity input-list)) truckloads-for-bulk) ; do we qualify?
-        (build-list (length input-list) (λ (x) discounted)) ; if yes, then discount all of them  TODO THIS IS WRONG
+                      [_ "this puzzle sucks and there are no other discounts"])]
+        [number-discounted (length (get activity input-list))])  ;     because this puzzle is stupid our only option is 'BC
+    (if (> number-discounted truckloads-for-bulk) ; do we qualify?
+        (append (drop-activity input-list activity number-discounted)
+                (build-list (length (get activity input-list)) (λ (x) discounted))) ; if yes, then discount all of them  TODO THIS IS WRONG
         input-list)))                                       ; if no, the carry on about your day
 
 
@@ -76,7 +78,7 @@
 ;
 (check-equal? (apply-bulk-discount 'BC 4 (list 'BC 'BC 'BC)) '(BC BC BC))
 (check-equal? (apply-bulk-discount 'BC 4 (list 'BC 'BC 'BC 'BC 'BC)) '(BC-disc BC-disc BC-disc BC-disc BC-disc))
-(check-equal? (apply-bulk-discount 'BC 1 (list 'OH 'BC 'AAC 'SCUBA 'BC)) '('OH 'BC-disc 'AAC 'SCUBA 'BC-disc)) ;todo
+(check-equal? (apply-bulk-discount 'BC 1 (list 'OH 'BC 'AAC 'SCUBA 'BC)) '(OH AAC SCUBA BC-disc BC-disc))
 ;---------------------------------------------------------------------------------
 
 
