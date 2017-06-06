@@ -1,35 +1,30 @@
+import java.util.*;
 
 public class TagSystem {
     
     public static void main(String[] args) {
-        //pass starting word and deletion number
-        performOperation("aaa", 2);
+        
+        //dictionary of rules for what to append to the end of the String
+        Map<String, String> productionRules = new HashMap<String, String>();
+        productionRules.put("a", "bc");
+        productionRules.put("b", "a");
+        productionRules.put("c", "aaa");
+        
+        //pass starting word, deletion number, and productionRules
+        performOperation("aaa", 2, productionRules);
         System.out.println("\n");
-        performOperation("aaaaaaa", 2);
+        performOperation("aaaaaaa", 2, productionRules);
     }
     
-    public static void performOperation(String word, int deletionNumber) {
+    public static void performOperation(String word, int deletionNumber, Map<String, String> rules) {
         System.out.println(word);
         //using predefinded halting parameter
         //stop when word is less than 2 characters
         while (word.length() > 1) {
-            //using predefined production rules
-            switch (word.charAt(0)) {
-                case 'a':
-                    word = word + "bc";
-                    //System.out.println(word);
-                    break;
-                case 'b':
-                    word = word + "a";
-                    //System.out.println(word);
-                    break;
-                case 'c':
-                    word = word + "aaa";
-                    //System.out.println(word);
-                    break;
-                default:
-                    break;
-            }
+            //New Implementation
+            //append corresponding value of the first character from rules dictionary
+            //Look, it's only three lines!!!
+            word = word + rules.get(String.valueOf(word.charAt(0)));
             word = word.substring(deletionNumber);
             System.out.println(word);
         }
