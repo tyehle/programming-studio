@@ -95,6 +95,8 @@
        (opera-house-discount run-length)
        )))
 
+; Implement with let* which let's everything previously defined stay in scope.
+
 ; A better approach would be to create a method which applies a list of discount functions
 (define (apply-discounts lst discounts)
   (let ([run-length (run-length-encoding (sort lst string<?))])

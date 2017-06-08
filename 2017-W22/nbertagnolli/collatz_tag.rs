@@ -48,7 +48,7 @@ fn collatz(s: String) -> () {
     tag_map.insert('c', "aaa".to_string());
 
     // Calculate the initial string length subtract 1 for newline character
-    let mut str_len = s.chars().count() - 1;
+    let mut str_len = s.chars().count();
     
     // Create a mutable version of the string to work with
     let mut tag_str: String  = s.chars().collect();
@@ -73,6 +73,7 @@ fn collatz(s: String) -> () {
 
         // Recalculate string length
         str_len = tag_str.chars().count();
+
     }
 
 }
