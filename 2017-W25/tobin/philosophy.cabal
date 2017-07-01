@@ -2,7 +2,7 @@ name:                philosophy
 version:             0.1.0.0
 -- synopsis:
 -- description:
-homepage:            https://github.com/githubuser/tobin#readme
+homepage:            https://github.com/tyehle/programming-studio/tree/master/2017-W25/tobin
 license:             BSD3
 license-file:        LICENSE
 author:              Tobin Yehle
@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Lib
+  exposed-modules:     Scraper
   build-depends:       base >= 4.7 && < 5
   default-language:    Haskell2010
 
@@ -25,6 +25,7 @@ executable philosophy
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , philosophy
+                     , scalpel
   default-language:    Haskell2010
 
 test-suite tobin-test
@@ -38,4 +39,4 @@ test-suite tobin-test
 
 source-repository head
   type:     git
-  location: https://github.com/githubuser/tobin
+  location: https://github.com/tyehle/programming-studio
