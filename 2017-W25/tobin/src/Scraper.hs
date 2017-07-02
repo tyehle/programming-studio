@@ -39,11 +39,11 @@ firstParenRemover = do
   after <- parenParser >> getInput
   return $ before ++ after
 
-allParenRemoveer :: Parsec String () String
-allParenRemoveer = do
+allParenRemover :: Parsec String () String
+allParenRemover = do
   before <- many $ noneOf "()"
-  after <- (parenParser >> allParenRemoveer) <|> return ""
+  after <- (parenParser >> allParenRemover) <|> return ""
   return $ before ++ after
 
 parenParser :: Parsec String () ()
-parenParser = void $ between (char '(') (char ')') allParenRemoveer
+parenParser = void $ between (char '(') (char ')') allParenRemover

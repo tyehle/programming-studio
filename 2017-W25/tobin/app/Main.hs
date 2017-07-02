@@ -24,8 +24,8 @@ linkPath end visited page | done = do
                               putStr "\n" >> hFlush stdout
                               return . return . reverse $ page : visited
                           | otherwise = do
-                              -- putStr "." >> hFlush stdout
-                              putStrLn . drop 6 $ page
+                              putStr "." >> hFlush stdout
+                              -- putStrLn . drop 6 $ page
                               links <- getLinks . fullLink $ page
                               let nextPage = links >>= find valid
                               maybe (return Nothing) (linkPath end (page : visited)) nextPage
