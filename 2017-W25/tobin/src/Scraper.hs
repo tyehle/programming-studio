@@ -2,10 +2,12 @@
 module Scraper where
 
 import Data.List (isPrefixOf)
+import Data.Maybe (fromMaybe)
 import Control.Monad (void)
 import Text.HTML.Scalpel
 import Text.Parsec
 import Text.Parsec.Char
+
 
 getLinks :: URL -> IO (Maybe [String])
 getLinks url = do
@@ -20,17 +22,28 @@ linksFromText = filter internal <$> attrs "href" "a"
   where
     internal = isPrefixOf "/wiki/"
 
+
 getPText :: Scraper String String
 getPText = do
-  inners <- innerHTMLs $ "div" @: ["id" @= "mw-content-text"] // "p"
+  inners <- innerHTMLs $ "div" @: ["id" @= "bodyContent"] // "p"
   return . concat $ inners
 
 
 dropParens :: String -> Maybe String
-dropParens = either (const Nothing) Just . parse (parser <* eof) "function input"
-  where
-    parser = do
-      before <- many $ noneOf "()"
-      after <- (parenParser >> parser) <|> return ""
-      return $ before ++ after
-    parenParser = void $ between (char '(') (char ')') parser
+dropParens input | '(' `elem` take 50 input = either (const Nothing) Just $ parse firstParenRemover "function input" input
+                 | otherwise = Just input
+
+firstParenRemover :: Parsec String () String
+firstParenRemover = do
+  before <- many $ noneOf "()"
+  after <- parenParser >> getInput
+  return $ before ++ after
+
+allParenRemoveer :: Parsec String () String
+allParenRemoveer = do
+  before <- many $ noneOf "()"
+  after <- (parenParser >> allParenRemoveer) <|> return ""
+  return $ before ++ after
+
+parenParser :: Parsec String () ()
+parenParser = void $ between (char '(') (char ')') allParenRemoveer
