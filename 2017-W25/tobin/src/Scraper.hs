@@ -30,12 +30,12 @@ getPText = do
 
 
 dropParens :: String -> Maybe String
-dropParens input | '(' `elem` take 50 input = either (const Nothing) Just $ parse firstParenRemover "function input" input
+dropParens input | '(' `elem` take 5000 input = either (const Nothing) Just $ parse firstParenRemover "function input" input
                  | otherwise = Just input
 
 firstParenRemover :: Parsec String () String
 firstParenRemover = do
-  before <- many $ noneOf "()"
+  before <- many $ noneOf "("
   after <- parenParser >> getInput
   return $ before ++ after
 
