@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Scraper where
 
-import Data.List (isPrefixOf)
+import Data.List (isPrefixOf, tails, find)
 import Data.Maybe (fromMaybe)
-import Control.Monad (void)
+import Control.Monad (void, join)
 import Text.HTML.Scalpel
 import Text.Parsec
 import Text.Parsec.Char
@@ -12,7 +12,7 @@ import Text.Parsec.Char
 getLinks :: URL -> IO (Maybe [String])
 getLinks url = do
   rawText <- scrapeURL url getPText
-  let noParens = rawText >>= dropParens
+  let noParens = join rawText >>= dropParens
   let links = noParens >>= flip scrapeStringLike linksFromText
   return links
 
@@ -23,10 +23,10 @@ linksFromText = filter internal <$> attrs "href" "a"
     internal = isPrefixOf "/wiki/"
 
 
-getPText :: Scraper String String
+getPText :: Scraper String (Maybe String)
 getPText = do
   inners <- innerHTMLs $ "div" @: ["id" @= "bodyContent"] // "p"
-  return . concat $ inners
+  return . find (isPrefixOf "<b>") . tails . concat $ inners
 
 
 dropParens :: String -> Maybe String

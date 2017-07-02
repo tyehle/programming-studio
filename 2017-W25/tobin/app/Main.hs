@@ -6,7 +6,7 @@ import Scraper (getLinks)
 
 main :: IO ()
 main = do
-  path <- linkPath "/wiki/Philosophy" [] "/wiki/Molecule"
+  path <- linkPath "/wiki/Philosophy" [] "/wiki/Telephone"
   maybe (putStrLn "Error") (mapM_ putStrLn) path
   -- maybeLinks <- getLinks (fullLink "/wiki/Science")
   -- maybe (putStrLn "Error") (mapM_ print . take 20) maybeLinks
