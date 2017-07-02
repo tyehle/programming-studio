@@ -1,6 +1,7 @@
 module Main where
 
 import System.IO (hFlush, stdout)
+import Data.List (isInfixOf, find)
 
 import Scraper (getLinks)
 
@@ -16,10 +17,6 @@ fullLink :: String -> String
 fullLink end = "https://en.wikipedia.org" ++ end
 
 
-headMaybe :: (Foldable f) => f a -> Maybe a
-headMaybe = foldr (\x _ -> return x) Nothing
-
-
 linkPath :: String -> [String] -> String -> IO (Maybe [String])
 linkPath end visited page | done = do
                               putStr "\n" >> hFlush stdout
@@ -28,7 +25,8 @@ linkPath end visited page | done = do
                               putStr "." >> hFlush stdout
                               -- putStrLn page
                               links <- getLinks . fullLink $ page
-                              let nextPage = links >>= headMaybe
+                              let nextPage = links >>= find valid
                               maybe (return Nothing) (linkPath end (page : visited)) nextPage
   where
     done = page == end || page `elem` visited
+    valid = not . isInfixOf "Help:IPA"
