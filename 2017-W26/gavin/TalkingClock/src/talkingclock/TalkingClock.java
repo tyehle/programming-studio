@@ -6,7 +6,15 @@ import java.util.Map;
 public class TalkingClock {
     
     public static void main(String[] args) {
-        String inputString = "14:01";
+        convertClock("00:00");
+        convertClock("01:30");
+        convertClock("12:05");
+        convertClock("14:01");
+        convertClock("20:29");
+        convertClock("21:00");
+    }
+        
+    public static void convertClock (String inputString) {
         String hour = inputString.substring(0, 2);
         String minute = inputString.substring(3);
         String outputString = "It's ";
