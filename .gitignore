@@ -18,3 +18,4 @@ build/
 # swift
 .build/
 cmake-build-debug/
+/2017-W26/gavin/TalkingClock/nbproject/private/
