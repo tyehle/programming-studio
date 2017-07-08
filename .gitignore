@@ -1,11 +1,20 @@
 *.exe
 *~
 
+# intellij projects
 .idea/
 *.iml
 
+# sbt/maven ... idk really
 out/
 
+# haskell stack
 .stack-work
-/2017-W22/gavin/nbproject/private/
-/2017-W22/gavin/build/
+
+# netbeans and java
+nbproject/private/
+build/
+
+# swift
+.build/
+cmake-build-debug/
