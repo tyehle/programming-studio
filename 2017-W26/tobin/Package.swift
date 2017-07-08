@@ -1,3 +1,3 @@
 import PackageDescription
 
-let package = Package(name: "HelloWorld")
+let package = Package(name: "Talking Clock")
