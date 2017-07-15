@@ -8,7 +8,8 @@ import util.control.Exception.allCatch
  */
 object Main {
   def main(args: Array[String]): Unit =
-    parseCommandLine(args).extract(println("enter a single number"), largestPalindrome)
+    parseCommandLine(args).extract(println("enter a single number"),
+                                   largestPalindrome)
 
   /** Define extract for options. This is like haskell's maybe function. */
   implicit class FancyOption[+A](val inner: Option[A]) {
@@ -25,9 +26,16 @@ object Main {
     }
   }
 
-  def largestPalindrome(n: Int): Unit = {
-    ???
+  def largestPalindrome(n: Int): (Int, Int) = {
+    val high = math.pow(10, n).toInt - 1
+    val low = math.pow(10, n-1).toInt
+    pairs(high, low).find(productIsPalindrome).getOrElse(throw new RuntimeException("No palindrome found"))
   }
+
+  def productIsPalindrome(pair: (Int, Int)): Boolean = isPalindrome((pair._1 * pair._2).toString)
+
+  @inline
+  def isPalindrome(s: String): Boolean = s.zip(s.reverse).forall(pair => pair._1 == pair._2)
 
   /**
    * Generate a list of pairs in order of their product
@@ -36,14 +44,11 @@ object Main {
    */
   def pairs(high: Int, low: Int): Stream[(Int, Int)] = {
     case class Pair(a: Int, b: Int) extends Ordered[Pair] {
-      lazy val product: Int = a*b
-      override def compare(that: Pair): Int = product compare that.product
+      override def compare(that: Pair): Int = (a*b) compare (that.a * that.b)
     }
 
     val fringe = new mutable.PriorityQueue[Pair]()
     fringe.enqueue((low to high).map(Pair(high, _)): _*)
-
-    println(s"Starting with $fringe")
 
     def genStream(): Stream[(Int, Int)] = {
       if(fringe.isEmpty) {
@@ -51,10 +56,8 @@ object Main {
       }
       else {
         val Pair(a, b) = fringe.dequeue()
-        println(s"Got ${(a, b)}")
         if(a > b) {
           fringe.enqueue(Pair(a -1, b))
-          println(s"Added ${(a - 1, b)}")
         }
         (a, b) #:: genStream()
       }

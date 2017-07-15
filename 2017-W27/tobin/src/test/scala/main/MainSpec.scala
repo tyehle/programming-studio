@@ -16,7 +16,8 @@ class MainSpec extends FlatSpec with Matchers {
   }
 
   it should "find the largest palindrome" in {
-    largestPalindrome(1) shouldBe 9
+    largestPalindrome(1) shouldBe (3, 3)
+    largestPalindrome(2) shouldBe (99, 91)
   }
 
   "The pair generator" should "work for small examples" in {
