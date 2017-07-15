@@ -16,11 +16,14 @@ class MainSpec extends FlatSpec with Matchers {
   }
 
   it should "find the largest palindrome" in {
-    largestPalindrome(1) shouldBe (3, 3)
-    largestPalindrome(2) shouldBe (99, 91)
+    largestPalindrome(1) shouldBe 9
+    largestPalindrome(2) shouldBe 9009
+    largestPalindrome(3) shouldBe 906609
+    largestPalindrome(4) shouldBe 99000099
+    largestPalindrome(5) shouldBe 9966006699L
   }
 
-  "The pair generator" should "work for small examples" in {
-    Main.pairs(4, 2).toList shouldBe List((4, 4), (4, 3), (3, 3), (4, 2), (3, 2), (2, 2))
+  "The product generator" should "work for small examples" in {
+    Main.products(4, 2).toList shouldBe List(16, 12, 9, 8, 6, 4)
   }
 }

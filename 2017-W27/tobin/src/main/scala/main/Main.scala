@@ -8,8 +8,8 @@ import util.control.Exception.allCatch
  */
 object Main {
   def main(args: Array[String]): Unit =
-    parseCommandLine(args).extract(println("enter a single number"),
-                                   largestPalindrome)
+    parseCommandLine(args).extract(println(s"Got ${args.mkString(", ")}, expected a single number"),
+                                   n => println(largestPalindrome(n)))
 
   /** Define extract for options. This is like haskell's maybe function. */
   implicit class FancyOption[+A](val inner: Option[A]) {
@@ -19,20 +19,20 @@ object Main {
   /**
    * Try to parse the command line args
    */
-  def parseCommandLine(args: Array[String]): Option[Int] = {
+  def parseCommandLine(args: Array[String]): Option[Long] = {
     args match {
-      case Array(number) => allCatch.opt(number.toInt)
+      case Array(number) => allCatch.opt(number.toLong)
       case _             => None
     }
   }
 
-  def largestPalindrome(n: Int): (Int, Int) = {
+  def largestPalindrome(n: Long): Long = {
     val high = math.pow(10, n).toInt - 1
     val low = math.pow(10, n-1).toInt
-    pairs(high, low).find(productIsPalindrome).getOrElse(throw new RuntimeException("No palindrome found"))
+    products(high, low).find(intIsPalindrome).getOrElse(throw new RuntimeException("No palindrome found"))
   }
 
-  def productIsPalindrome(pair: (Int, Int)): Boolean = isPalindrome((pair._1 * pair._2).toString)
+  def intIsPalindrome(n: Long): Boolean = isPalindrome(n.toString)
 
   @inline
   def isPalindrome(s: String): Boolean = s.zip(s.reverse).forall(pair => pair._1 == pair._2)
@@ -42,24 +42,24 @@ object Main {
    * @param high The largest value in the pair
    * @param low The smallest value in the pair
    */
-  def pairs(high: Int, low: Int): Stream[(Int, Int)] = {
-    case class Pair(a: Int, b: Int) extends Ordered[Pair] {
+  def products(high: Long, low: Long): Stream[Long] = {
+    case class Pair(a: Long, b: Long) extends Ordered[Pair] {
       override def compare(that: Pair): Int = (a*b) compare (that.a * that.b)
     }
 
     val fringe = new mutable.PriorityQueue[Pair]()
     fringe.enqueue((low to high).map(Pair(high, _)): _*)
 
-    def genStream(): Stream[(Int, Int)] = {
+    def genStream(): Stream[Long] = {
       if(fringe.isEmpty) {
         Stream.empty
       }
       else {
         val Pair(a, b) = fringe.dequeue()
         if(a > b) {
-          fringe.enqueue(Pair(a -1, b))
+          fringe.enqueue(Pair(a-1, b))
         }
-        (a, b) #:: genStream()
+        (a * b) #:: genStream()
       }
     }
 
