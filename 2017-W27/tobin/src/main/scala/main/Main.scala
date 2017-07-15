@@ -1,6 +1,5 @@
 package main
 
-import scala.collection.mutable
 import util.control.Exception.allCatch
 
 /**
@@ -32,6 +31,7 @@ object Main {
     products(high, low).find(intIsPalindrome).getOrElse(throw new RuntimeException("No palindrome found"))
   }
 
+  @inline
   def intIsPalindrome(n: Long): Boolean = isPalindrome(n.toString)
 
   @inline
@@ -47,22 +47,11 @@ object Main {
       override def compare(that: Pair): Int = (a*b) compare (that.a * that.b)
     }
 
-    val fringe = new mutable.PriorityQueue[Pair]()
-    fringe.enqueue((low to high).map(Pair(high, _)): _*)
-
-    def genStream(): Stream[Long] = {
-      if(fringe.isEmpty) {
-        Stream.empty
-      }
-      else {
-        val Pair(a, b) = fringe.dequeue()
-        if(a > b) {
-          fringe.enqueue(Pair(a-1, b))
-        }
-        (a * b) #:: genStream()
-      }
+    def genStream(fringe: SkewHeap[Pair]): Stream[Long] = fringe.firstView match {
+      case None => Stream.empty
+      case Some((Pair(a, b), rest)) => (a * b) #:: genStream(if(a > b) rest.add(Pair(a-1, b)) else rest)
     }
 
-    genStream()
+    genStream(SkewHeap((low to high).map(Pair(high, _)): _*))
   }
 }
