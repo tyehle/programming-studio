@@ -18,4 +18,8 @@ class MainSpec extends FlatSpec with Matchers {
   it should "find the largest palindrome" in {
     largestPalindrome(1) shouldBe 9
   }
+
+  "The pair generator" should "work for small examples" in {
+    Main.pairs(4, 2).toList shouldBe List((4, 4), (4, 3), (3, 3), (4, 2), (3, 2), (2, 2))
+  }
 }

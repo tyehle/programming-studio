@@ -1,5 +1,6 @@
 package main
 
+import scala.collection.mutable
 import util.control.Exception.allCatch
 
 /**
@@ -26,5 +27,39 @@ object Main {
 
   def largestPalindrome(n: Int): Unit = {
     ???
+  }
+
+  /**
+   * Generate a list of pairs in order of their product
+   * @param high The largest value in the pair
+   * @param low The smallest value in the pair
+   */
+  def pairs(high: Int, low: Int): Stream[(Int, Int)] = {
+    case class Pair(a: Int, b: Int) extends Ordered[Pair] {
+      lazy val product: Int = a*b
+      override def compare(that: Pair): Int = product compare that.product
+    }
+
+    val fringe = new mutable.PriorityQueue[Pair]()
+    fringe.enqueue((low to high).map(Pair(high, _)): _*)
+
+    println(s"Starting with $fringe")
+
+    def genStream(): Stream[(Int, Int)] = {
+      if(fringe.isEmpty) {
+        Stream.empty
+      }
+      else {
+        val Pair(a, b) = fringe.dequeue()
+        println(s"Got ${(a, b)}")
+        if(a > b) {
+          fringe.enqueue(Pair(a -1, b))
+          println(s"Added ${(a - 1, b)}")
+        }
+        (a, b) #:: genStream()
+      }
+    }
+
+    genStream()
   }
 }
