@@ -28,14 +28,13 @@ object Main {
   def largestPalindrome(n: Long): Long = {
     val high = math.pow(10, n).toInt - 1
     val low = math.pow(10, n-1).toInt
-    products(high, low).find(intIsPalindrome).getOrElse(throw new RuntimeException("No palindrome found"))
+    products(high, low).find(isPalindrome).getOrElse(throw new RuntimeException("No palindrome found"))
   }
 
-  @inline
-  def intIsPalindrome(n: Long): Boolean = isPalindrome(n.toString)
-
-  @inline
-  def isPalindrome(s: String): Boolean = s.zip(s.reverse).forall(pair => pair._1 == pair._2)
+  def isPalindrome(n: Long): Boolean = {
+    val s = n.toString
+    s == s.reverse
+  }
 
   /**
    * Generate a list of pairs in order of their product
