@@ -1,6 +1,5 @@
 package main
 
-import scala.collection.mutable
 import util.control.Exception.allCatch
 
 /**
@@ -29,13 +28,13 @@ object Main {
   def largestPalindrome(n: Long): Long = {
     val high = math.pow(10, n).toInt - 1
     val low = math.pow(10, n-1).toInt
-    products(high, low).find(intIsPalindrome).getOrElse(throw new RuntimeException("No palindrome found"))
+    products(high, low).find(isPalindrome).getOrElse(throw new RuntimeException("No palindrome found"))
   }
 
-  def intIsPalindrome(n: Long): Boolean = isPalindrome(n.toString)
-
-  @inline
-  def isPalindrome(s: String): Boolean = s.zip(s.reverse).forall(pair => pair._1 == pair._2)
+  def isPalindrome(n: Long): Boolean = {
+    val s = n.toString
+    s == s.reverse
+  }
 
   /**
    * Generate a list of pairs in order of their product
@@ -47,22 +46,11 @@ object Main {
       override def compare(that: Pair): Int = (a*b) compare (that.a * that.b)
     }
 
-    val fringe = new mutable.PriorityQueue[Pair]()
-    fringe.enqueue((low to high).map(Pair(high, _)): _*)
-
-    def genStream(): Stream[Long] = {
-      if(fringe.isEmpty) {
-        Stream.empty
-      }
-      else {
-        val Pair(a, b) = fringe.dequeue()
-        if(a > b) {
-          fringe.enqueue(Pair(a-1, b))
-        }
-        (a * b) #:: genStream()
-      }
+    def genStream(fringe: SkewHeap[Pair]): Stream[Long] = fringe.firstView match {
+      case None => Stream.empty
+      case Some((Pair(a, b), rest)) => (a * b) #:: genStream(if(a > b) rest.add(Pair(a-1, b)) else rest)
     }
 
-    genStream()
+    genStream(SkewHeap((low to high).map(Pair(high, _)): _*))
   }
 }
