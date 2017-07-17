@@ -35,9 +35,9 @@
   (let ([smaller (if (< x y) x y)]  ; Always pass in the bigger-ish one to avoid duplicating symmetric calls
         [other   (if (< x y) y x)])
   (if ( > 3 x) ; TERMINATED!
-      (* 3 x) 
+      (* x y) 
       (if (> 3 y) ; ALSO TERMINATED!
-          9       ; awh yeah get that memoized brute force solution!
+          (* x y)       ; awh yeah get that memoized brute force solution!
           (safe-list-max (filter palindrome? `(,(* x y) ,(compute-product (- other 1) smaller) ,(compute-product other (- smaller 1))))))) 
  ))
 
